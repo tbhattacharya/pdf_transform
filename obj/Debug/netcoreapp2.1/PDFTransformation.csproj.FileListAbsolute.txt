@@ -1,0 +1,14 @@
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/bin/Debug/netcoreapp2.1/PDFTransformation.deps.json
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/bin/Debug/netcoreapp2.1/PDFTransformation.runtimeconfig.json
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/bin/Debug/netcoreapp2.1/PDFTransformation.runtimeconfig.dev.json
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/bin/Debug/netcoreapp2.1/PDFTransformation.dll
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/bin/Debug/netcoreapp2.1/PDFTransformation.pdb
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.csprojAssemblyReference.cache
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.csproj.CoreCompileInputs.cache
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.RazorAssemblyInfo.cache
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.RazorAssemblyInfo.cs
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.AssemblyInfoInputs.cache
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.AssemblyInfo.cs
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.RazorTargetAssemblyInfo.cache
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.dll
+/Users/tamalbhattacharya/Projects/PDFTransformation/PDFTransformation/obj/Debug/netcoreapp2.1/PDFTransformation.pdb
