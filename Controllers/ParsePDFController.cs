@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.FileProviders;
 using System.IO;
-using Syncfusion.Pdf.Parsing;
+using PDFTransformation.PDFUtils;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,35 +11,40 @@ namespace PDFTransformation.Controllers
     [Route("api/[controller]")]
     public class ParsePDFController : Controller
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        readonly IHostingEnvironment _hostingEnvironment;
+        readonly string _wwwrootPath;
+        readonly string _folderUpload = "Upload";
+        readonly string _folderDownload = "Download";
+        readonly string _newUploadPath;
+        readonly string _newDownloadPath;
 
         public ParsePDFController(IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
+            _wwwrootPath = _hostingEnvironment.WebRootPath;
+            _newUploadPath = System.IO.Path.Combine(_wwwrootPath, _folderUpload);
+            _newDownloadPath = System.IO.Path.Combine(_wwwrootPath, _folderDownload);
+            if (!Directory.Exists(_newDownloadPath))
+            {
+                Directory.CreateDirectory(_newDownloadPath);
+            }
         }
 
         [HttpPost, DisableRequestSizeLimit]
-        public ActionResult UploadFile()
+        public ActionResult ParseFile(string fileName)
         {
             try
             {
-                string wwwrootPath = _hostingEnvironment.WebRootPath;
-                string folderName = "Upload";
-                string newPath = Path.Combine(wwwrootPath, folderName);
-                string fileName = @"SEP-Bericht Testaufgabe.pdf";
-                string fullPath = Path.Combine(newPath, fileName);
-                FileStream fileStreamInput = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
-                PdfLoadedDocument loadedDocument = new PdfLoadedDocument(fileStreamInput);
-                string extractedText = string.Empty;
-                for (var i = 0; i < loadedDocument.Pages.Count; i++)
-                {
-                    extractedText += loadedDocument.Pages[i].ExtractText(true);
-                }
-                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(extractedText);
-                MemoryStream stream = new MemoryStream(byteArray);
-                FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/txt");
-                fileStreamResult.FileDownloadName = "Sample.txt";
-                return fileStreamResult;
+                string fullUploadPath = System.IO.Path.Combine(_newUploadPath, fileName);
+                string downloadPath = System.IO.Path.Combine(_newDownloadPath, fileName);
+
+                //Re-order the pdf in the required sequence as given 
+                //PDFHelper.ReOrderPages(fullUploadPath, "1-4,5,3,8-13,6,7,14-15", downloadPath);
+                PDFHelper.RemoveFooterPagination(fullUploadPath, downloadPath);
+
+                //Extract elements from pdf by pages and put back in specified order.
+
+                return Json("fileName:" + fileName);
             }
             catch (System.Exception ex)
             {

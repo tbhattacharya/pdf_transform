@@ -1,5 +1,6 @@
 ﻿using System.IO;
-using System.Net.Http.Headers;
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ namespace PDFTransformation.Controllers
     [Route("api/[controller]")]
     public class UploadController : Controller
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        readonly IHostingEnvironment _hostingEnvironment;
 
         public UploadController(IHostingEnvironment hostingEnvironment)
         {
@@ -29,22 +30,21 @@ namespace PDFTransformation.Controllers
                 {
                     Directory.CreateDirectory(newPath);
                 }
+                string fileName = CommonUtils.GenerateFileNames(".pdf");
                 if (file.Length > 0)
                 {
-                    string fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                     string fullPath = Path.Combine(newPath, fileName);
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
                         file.CopyTo(stream);
                     }
                 }
-                return Json("Upload Successful.");
+                return Json("fileName:"+ fileName);
             }
             catch (System.Exception ex)
             {
                 return Json("Upload Failed: " + ex.Message);
             }
         }
-
     }
 }

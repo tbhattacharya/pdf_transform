@@ -6,11 +6,19 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
+    <Folder Include="PDFUtils\" />
+    <Folder Include="Utils\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Syncfusion.Pdf.NETStandard" Version="16.3.0.21" />
+    <PackageReference Include="iTextSharp" Version="5.5.13" />
+    <PackageReference Include="itextsharp.xtra" Version="5.5.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Utils\StringUtils.cs" />
+  </ItemGroup>
 </Project>
