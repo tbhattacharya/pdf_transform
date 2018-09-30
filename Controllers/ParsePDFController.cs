@@ -15,7 +15,9 @@ namespace PDFTransformation.Controllers
         readonly string _wwwrootPath;
         readonly string _folderUpload = "Upload";
         readonly string _folderDownload = "Download";
+        readonly string _folderTemp = "Temp";
         readonly string _newUploadPath;
+        readonly string _newTempPath;
         readonly string _newDownloadPath;
 
         public ParsePDFController(IHostingEnvironment hostingEnvironment)
@@ -23,10 +25,15 @@ namespace PDFTransformation.Controllers
             _hostingEnvironment = hostingEnvironment;
             _wwwrootPath = _hostingEnvironment.WebRootPath;
             _newUploadPath = System.IO.Path.Combine(_wwwrootPath, _folderUpload);
+            _newTempPath = System.IO.Path.Combine(_wwwrootPath, _folderTemp);
             _newDownloadPath = System.IO.Path.Combine(_wwwrootPath, _folderDownload);
             if (!Directory.Exists(_newDownloadPath))
             {
                 Directory.CreateDirectory(_newDownloadPath);
+            }
+            if (!Directory.Exists(_newTempPath))
+            {
+                Directory.CreateDirectory(_newTempPath);
             }
         }
 
@@ -36,11 +43,12 @@ namespace PDFTransformation.Controllers
             try
             {
                 string fullUploadPath = System.IO.Path.Combine(_newUploadPath, fileName);
+                string tempPath = System.IO.Path.Combine(_newTempPath, fileName);
                 string downloadPath = System.IO.Path.Combine(_newDownloadPath, fileName);
 
                 //Re-order the pdf in the required sequence as given 
-                //PDFHelper.ReOrderPages(fullUploadPath, "1-4,5,3,8-13,6,7,14-15", downloadPath);
-                PDFHelper.RemoveFooterPagination(fullUploadPath, downloadPath);
+                PDFHelper.ReOrderPages(fullUploadPath, "1-4,5,3,8-13,6,7,14-15", tempPath);
+                PDFHelper.UpdateFooterPagination(tempPath, downloadPath);
 
                 //Extract elements from pdf by pages and put back in specified order.
 

@@ -5,6 +5,8 @@ using iTextSharp.text;
 using iTextSharp.text.pdf.parser;
 using iTextSharp.xtra.iTextSharp.text.pdf.pdfcleanup;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace PDFTransformation.PDFUtils
 {
@@ -52,27 +54,44 @@ namespace PDFTransformation.PDFUtils
             return output.ToString();
         }
 
-        public static void RemoveFooterPagination(string inputPdf, string outputPdf)
+        public static void UpdateFooterPagination(string inputPdf, string outputPdf)
         {
-            //Create our output file, nothing special here
-            using (FileStream fs = new FileStream(outputPdf, FileMode.Create, FileAccess.Write, FileShare.None))
+
+            PdfReader reader = new PdfReader(inputPdf);
+            FileStream fs = new FileStream(outputPdf, FileMode.Create, FileAccess.Write);
+            int n = reader.NumberOfPages;
+            for (int i = 6; i <= n; i++)
             {
-                //TaggedPdfReaderTool reader = new TaggedPdfReaderTool();
-                //using (MemoryStream ms = new MemoryStream())
-                //{
-                //    reader.ConvertToXml(new PdfReader(inputPdf), ms);
+                PdfDictionary dict = reader.GetPageN(i);
+                PdfObject obj = dict.GetDirectObject(PdfName.CONTENTS);
+                if (obj.GetType() == typeof(PRStream))
+                {
+                    PRStream stream = (PRStream)obj;
+                    byte[] data = PdfReader.GetStreamBytes(stream);
+                    String oldStr = System.Text.Encoding.UTF8.GetString(data);
 
-                //}
+                    String pageString = MatchRegex(oldStr, @"\[\(Seite \)\]TJ.*\[\(");
 
-                PdfReader reader = new PdfReader(inputPdf);
-                PdfStamper stamper = new PdfStamper(reader, fs);
-                List<PdfCleanUpLocation> cleanUpLocations = new List<PdfCleanUpLocation>();
-                cleanUpLocations.Add(new PdfCleanUpLocation(12, new Rectangle(97f, 405f, 480f, 445f), BaseColor.GRAY));
-                PdfCleanUpProcessor cleaner = new PdfCleanUpProcessor(cleanUpLocations, stamper);
-                cleaner.CleanUp();
-                stamper.Close();
-                reader.Close();
+                    //Regex replacement of page string
+                    String updatedPageString = Regex.Replace(pageString, @"\[\(\d+\)\]", "[(" +i+")]");
+                    String newString = Regex.Replace(oldStr, @"\[\(Seite \)\]TJ.*\[\(", updatedPageString, RegexOptions.Singleline);
+                    stream.SetData(System.Text.Encoding.UTF8.GetBytes(newString));
+                }
             }
+            PdfStamper stamper = new PdfStamper(reader, fs);
+            stamper.Close();
+            reader.Close();
         }
+
+        private static String MatchRegex(String input, String pattern)
+        {
+            //Regex word = new Regex(@"\[\(Seite \)\]TJ.*/s");
+            Match match = Regex.Match(input, pattern, RegexOptions.Singleline);
+            while (match.Success)
+            {
+                return match.Value;
+            }
+            return "";
         }
+    }
 }

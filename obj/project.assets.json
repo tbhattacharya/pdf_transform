@@ -2,6 +2,27 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.1": {
+      "iTextSharp/5.5.13": {
+        "type": "package",
+        "compile": {
+          "lib/itextsharp.dll": {}
+        },
+        "runtime": {
+          "lib/itextsharp.dll": {}
+        }
+      },
+      "itextsharp.xtra/5.5.13": {
+        "type": "package",
+        "dependencies": {
+          "iTextSharp": "5.5.13"
+        },
+        "compile": {
+          "lib/itextsharp.xtra.dll": {}
+        },
+        "runtime": {
+          "lib/itextsharp.xtra.dll": {}
+        }
+      },
       "Microsoft.AspNet.WebApi.Client/5.2.6": {
         "type": "package",
         "dependencies": {
@@ -2601,6 +2622,24 @@
           }
         }
       },
+      "Microsoft.Win32.SystemEvents/4.5.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.0"
+        },
+        "compile": {
+          "ref/netstandard2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Win32.SystemEvents.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/netcoreapp2.0/Microsoft.Win32.SystemEvents.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
+        }
+      },
       "NETStandard.Library/2.0.3": {
         "type": "package",
         "dependencies": {
@@ -2866,42 +2905,6 @@
           }
         }
       },
-      "Syncfusion.Compression.NETStandard/16.3.0.21": {
-        "type": "package",
-        "dependencies": {
-          "NETStandard.Library": "2.0.0"
-        },
-        "compile": {
-          "lib/netstandard2.0/Syncfusion.Compression.Portable.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/Syncfusion.Compression.Portable.dll": {}
-        }
-      },
-      "Syncfusion.Licensing/16.3.0.21": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/Syncfusion.Licensing.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/Syncfusion.Licensing.dll": {}
-        }
-      },
-      "Syncfusion.Pdf.NETStandard/16.3.0.21": {
-        "type": "package",
-        "dependencies": {
-          "NETStandard.Library": "2.0.0",
-          "Syncfusion.Compression.NETStandard": "16.3.0.21",
-          "Syncfusion.Licensing": "16.3.0.21",
-          "System.Text.Encoding.CodePages": "4.4.0"
-        },
-        "compile": {
-          "lib/netstandard2.0/Syncfusion.Pdf.Portable.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/Syncfusion.Pdf.Portable.dll": {}
-        }
-      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -3140,6 +3143,29 @@
         },
         "compile": {
           "ref/netstandard1.5/System.Diagnostics.Tracing.dll": {}
+        }
+      },
+      "System.Drawing.Common/4.5.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.0",
+          "Microsoft.Win32.SystemEvents": "4.5.0"
+        },
+        "compile": {
+          "ref/netstandard2.0/System.Drawing.Common.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.Drawing.Common.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/unix/lib/netcoreapp2.0/System.Drawing.Common.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
+          "runtimes/win/lib/netcoreapp2.0/System.Drawing.Common.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
         }
       },
       "System.Dynamic.Runtime/4.3.0": {
@@ -4100,7 +4126,7 @@
           "System.Runtime.CompilerServices.Unsafe": "4.5.0"
         },
         "compile": {
-          "ref/netstandard2.0/System.Text.Encoding.CodePages.dll": {}
+          "ref/netstandard2.0/_._": {}
         },
         "runtime": {
           "lib/netstandard2.0/System.Text.Encoding.CodePages.dll": {}
@@ -4373,6 +4399,30 @@
     }
   },
   "libraries": {
+    "iTextSharp/5.5.13": {
+      "sha512": "MigtmZrqjrJ4QERhgNZc+zhl+XSNV5y3JoH5nNxzdNjPvZJgzYN2qLRQhqtWsF9F/1H28SnOkoS6uIlSduSrXQ==",
+      "type": "package",
+      "path": "itextsharp/5.5.13",
+      "files": [
+        "AGPL.txt",
+        "itextsharp.5.5.13.nupkg.sha512",
+        "itextsharp.nuspec",
+        "lib/iTextSharp.xml",
+        "lib/itextsharp.dll",
+        "notice.txt"
+      ]
+    },
+    "itextsharp.xtra/5.5.13": {
+      "sha512": "dLFN3sw44j8MEjg9QRIY/Lo2MbbFubaOMwahtum+tDJx9RpTl1yHpYvM8JeZPyYi+OW6SKaLGUgf+dxqQSjBPw==",
+      "type": "package",
+      "path": "itextsharp.xtra/5.5.13",
+      "files": [
+        "AGPL.txt",
+        "itextsharp.xtra.5.5.13.nupkg.sha512",
+        "itextsharp.xtra.nuspec",
+        "lib/itextsharp.xtra.dll"
+      ]
+    },
     "Microsoft.AspNet.WebApi.Client/5.2.6": {
       "sha512": "rMDlyePoxggkmN/qgha1+BR2Uy+dOr38xKCQOPfVNKGY07R2nYJGMTKJFE1XFgwD70RYUNazf2fqutjJF18XgQ==",
       "type": "package",
@@ -6803,6 +6853,25 @@
         "version.txt"
       ]
     },
+    "Microsoft.Win32.SystemEvents/4.5.0": {
+      "sha512": "aXrCxI6PdEEJkqIDRYCe2oBRZ1gto5Ac1Y/WuahG/CD+PB5rAVFU7VpkBILBUQQG/NBtxbIRM0Q61m5uJQLTPw==",
+      "type": "package",
+      "path": "microsoft.win32.systemevents/4.5.0",
+      "files": [
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/Microsoft.Win32.SystemEvents.dll",
+        "lib/netstandard2.0/Microsoft.Win32.SystemEvents.dll",
+        "microsoft.win32.systemevents.4.5.0.nupkg.sha512",
+        "microsoft.win32.systemevents.nuspec",
+        "ref/net461/Microsoft.Win32.SystemEvents.dll",
+        "ref/netstandard2.0/Microsoft.Win32.SystemEvents.dll",
+        "runtimes/win/lib/netcoreapp2.0/Microsoft.Win32.SystemEvents.dll",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
     "NETStandard.Library/2.0.3": {
       "sha512": "st47PosZSHrjECdjeIzZQbzivYBJFv6P2nv4cj2ypdI204DO+vZ7l5raGMiX4eXMJ53RfOIg+/s4DHVZ54Nu2A==",
       "type": "package",
@@ -7235,63 +7304,6 @@
         "runtimes/win-x86/native/sni.dll",
         "useSharedDesignerContext.txt",
         "version.txt"
-      ]
-    },
-    "Syncfusion.Compression.NETStandard/16.3.0.21": {
-      "sha512": "GS68MMiWFYt7GHhpfmr4iXL2v/BP75EKk5Q9CVVy23aa5ELMK1iE6oAonZ2PottYgcXw/ayRUp1WIw8yEmH8/A==",
-      "type": "package",
-      "path": "syncfusion.compression.netstandard/16.3.0.21",
-      "files": [
-        ".signature.p7s",
-        "lib/netstandard1.2/Syncfusion.Compression.Portable.dll",
-        "lib/netstandard1.2/Syncfusion.Compression.Portable.xml",
-        "lib/netstandard1.4/Syncfusion.Compression.Portable.dll",
-        "lib/netstandard1.4/Syncfusion.Compression.Portable.xml",
-        "lib/netstandard2.0/Syncfusion.Compression.Portable.dll",
-        "lib/netstandard2.0/Syncfusion.Compression.Portable.xml",
-        "syncfusion.compression.netstandard.16.3.0.21.nupkg.sha512",
-        "syncfusion.compression.netstandard.nuspec"
-      ]
-    },
-    "Syncfusion.Licensing/16.3.0.21": {
-      "sha512": "3eUgJfio0CJDZfelQcZPKe6jpC670ysA6tbDda3ZjvnqYr7rDnMlRlOFWeyXgKrc4X0UZpS8eitIlBrb3F6SaA==",
-      "type": "package",
-      "path": "syncfusion.licensing/16.3.0.21",
-      "files": [
-        ".signature.p7s",
-        "lib/MonoAndroid10/Syncfusion.Licensing.dll",
-        "lib/Xamarin.Mac/Syncfusion.Licensing.dll",
-        "lib/Xamarin.iOS10/Syncfusion.Licensing.dll",
-        "lib/net20/Syncfusion.Licensing.dll",
-        "lib/net35/Syncfusion.Licensing.dll",
-        "lib/net40/Syncfusion.Licensing.dll",
-        "lib/net45/Syncfusion.Licensing.dll",
-        "lib/net451/Syncfusion.Licensing.dll",
-        "lib/net46/Syncfusion.Licensing.dll",
-        "lib/netstandard1.0/Syncfusion.Licensing.dll",
-        "lib/netstandard1.2/Syncfusion.Licensing.dll",
-        "lib/netstandard1.4/Syncfusion.Licensing.dll",
-        "lib/netstandard2.0/Syncfusion.Licensing.dll",
-        "lib/portable-win+net45+wp80+win81+wpa81/Syncfusion.Licensing.dll",
-        "lib/uap10.0/Syncfusion.Licensing.dll",
-        "syncfusion.licensing.16.3.0.21.nupkg.sha512",
-        "syncfusion.licensing.nuspec"
-      ]
-    },
-    "Syncfusion.Pdf.NETStandard/16.3.0.21": {
-      "sha512": "0ycUAghVcWo+08PdbAvvttnS7wjR2PqOFZzwSQwNl9VTx3w82zZHzOQTnCjIX3S8G9d9AiFhTSU1gTjmkgUVDw==",
-      "type": "package",
-      "path": "syncfusion.pdf.netstandard/16.3.0.21",
-      "files": [
-        ".signature.p7s",
-        "lib/netstandard1.2/Syncfusion.Pdf.Portable.dll",
-        "lib/netstandard1.2/Syncfusion.Pdf.Portable.xml",
-        "lib/netstandard1.4/Syncfusion.Pdf.Portable.dll",
-        "lib/netstandard1.4/Syncfusion.Pdf.Portable.xml",
-        "lib/netstandard2.0/Syncfusion.Pdf.Portable.dll",
-        "lib/netstandard2.0/Syncfusion.Pdf.Portable.xml",
-        "syncfusion.pdf.netstandard.16.3.0.21.nupkg.sha512",
-        "syncfusion.pdf.netstandard.nuspec"
       ]
     },
     "System.AppContext/4.3.0": {
@@ -8167,6 +8179,38 @@
         "ref/xamarinwatchos10/_._",
         "system.diagnostics.tracing.4.3.0.nupkg.sha512",
         "system.diagnostics.tracing.nuspec"
+      ]
+    },
+    "System.Drawing.Common/4.5.0": {
+      "sha512": "LLI+GGolsv4K8Eu2PN5N3/1t4pM5zoU4fM3lWhSOawJuCjv9iQJJODjd4/QJIgpjlqxzQDMMoOjAaVuzrNJT0g==",
+      "type": "package",
+      "path": "system.drawing.common/4.5.0",
+      "files": [
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net461/System.Drawing.Common.dll",
+        "lib/netstandard2.0/System.Drawing.Common.dll",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net461/System.Drawing.Common.dll",
+        "ref/netstandard2.0/System.Drawing.Common.dll",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "runtimes/unix/lib/netcoreapp2.0/System.Drawing.Common.dll",
+        "runtimes/win/lib/netcoreapp2.0/System.Drawing.Common.dll",
+        "system.drawing.common.4.5.0.nupkg.sha512",
+        "system.drawing.common.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
     "System.Dynamic.Runtime/4.3.0": {
@@ -11590,7 +11634,9 @@
     ".NETCoreApp,Version=v2.1": [
       "Microsoft.AspNetCore.App >= 2.1.1",
       "Microsoft.NETCore.App >= 2.1.0",
-      "Syncfusion.Pdf.NETStandard >= 16.3.0.21"
+      "System.Drawing.Common >= 4.5.0",
+      "iTextSharp >= 5.5.13",
+      "itextsharp.xtra >= 5.5.13"
     ]
   },
   "packageFolders": {
@@ -11637,9 +11683,17 @@
             "target": "Package",
             "version": "2.1.1"
           },
-          "Syncfusion.Pdf.NETStandard": {
+          "itextsharp.xtra": {
             "target": "Package",
-            "version": "16.3.0.21"
+            "version": "5.5.13"
+          },
+          "System.Drawing.Common": {
+            "target": "Package",
+            "version": "4.5.0"
+          },
+          "iTextSharp": {
+            "target": "Package",
+            "version": "5.5.13"
           },
           "Microsoft.NETCore.App": {
             "suppressParent": "All",
@@ -11655,5 +11709,27 @@
         "warn": true
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'iTextSharp 5.5.13' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
+      "libraryId": "iTextSharp",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.1"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'itextsharp.xtra 5.5.13' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
+      "libraryId": "itextsharp.xtra",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.1"
+      ]
+    }
+  ]
 }
