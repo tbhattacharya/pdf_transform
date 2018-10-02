@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using Microsoft.AspNetCore.Hosting;
 using PDFTransformation.PDFUtils;
+using System.Threading.Tasks;
+using System;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -9,32 +11,11 @@ namespace PDFTransformation.Controllers
 {
     [Produces("application/pdf")]
     [Route("api/[controller]")]
-    public class ParsePDFController : Controller
+    public class ParsePDFController : BaseController
     {
-        readonly IHostingEnvironment _hostingEnvironment;
-        readonly string _wwwrootPath;
-        readonly string _folderUpload = "Upload";
-        readonly string _folderDownload = "Download";
-        readonly string _folderTemp = "Temp";
-        readonly string _newUploadPath;
-        readonly string _newTempPath;
-        readonly string _newDownloadPath;
-
-        public ParsePDFController(IHostingEnvironment hostingEnvironment)
+        public ParsePDFController(IHostingEnvironment hostingEnvironment): base(hostingEnvironment)
         {
-            _hostingEnvironment = hostingEnvironment;
-            _wwwrootPath = _hostingEnvironment.WebRootPath;
-            _newUploadPath = System.IO.Path.Combine(_wwwrootPath, _folderUpload);
-            _newTempPath = System.IO.Path.Combine(_wwwrootPath, _folderTemp);
-            _newDownloadPath = System.IO.Path.Combine(_wwwrootPath, _folderDownload);
-            if (!Directory.Exists(_newDownloadPath))
-            {
-                Directory.CreateDirectory(_newDownloadPath);
-            }
-            if (!Directory.Exists(_newTempPath))
-            {
-                Directory.CreateDirectory(_newTempPath);
-            }
+
         }
 
         [HttpPost, DisableRequestSizeLimit]
@@ -42,22 +23,35 @@ namespace PDFTransformation.Controllers
         {
             try
             {
-                string fullUploadPath = System.IO.Path.Combine(_newUploadPath, fileName);
-                string tempPath = System.IO.Path.Combine(_newTempPath, fileName);
-                string downloadPath = System.IO.Path.Combine(_newDownloadPath, fileName);
 
-                //Re-order the pdf in the required sequence as given 
-                PDFHelper.ReOrderPages(fullUploadPath, "1-4,5,3,8-13,6,7,14-15", tempPath);
-                PDFHelper.UpdateFooterPagination(tempPath, downloadPath);
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    String content = reader.ReadToEnd();
+                    string fullUploadPath = System.IO.Path.Combine(_newUploadPath, fileName);
+                    string tempPath = System.IO.Path.Combine(_newTempPath, fileName);
+                    string downloadPath = System.IO.Path.Combine(_newDownloadPath, fileName);
 
-                //Extract elements from pdf by pages and put back in specified order.
+                    //Re-order the pdf in the required sequence as given 
+                    PDFHelper.ReOrderPages(fullUploadPath, PDFHelper.CreateNewOrder(content), tempPath);
+                    //Remove the pagination and update
+                    //PDFHelper.RemoveFooterPagination(tempPath, downloadPath);
 
-                return Json("fileName:" + fileName);
+                    //Update pagination in footer
+                    PDFHelper.UpdateFooterPagination(tempPath, downloadPath);
+
+                    //Create title
+
+                    //Delete temp file
+                    System.IO.File.Delete(tempPath);
+
+                    return Json("fileName:" + fileName);
+                }
             }
             catch (System.Exception ex)
             {
                 return Json("Upload Failed: " + ex.Message);
             }
         }
+
     }
 }

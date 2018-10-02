@@ -8,13 +8,12 @@ namespace PDFTransformation.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
-    public class UploadController : Controller
+    public class UploadController : BaseController
     {
-        readonly IHostingEnvironment _hostingEnvironment;
 
-        public UploadController(IHostingEnvironment hostingEnvironment)
+        public UploadController(IHostingEnvironment hostingEnvironment): base(hostingEnvironment)
         {
-            _hostingEnvironment = hostingEnvironment;
+
         }
 
         [HttpPost, DisableRequestSizeLimit]
@@ -23,17 +22,10 @@ namespace PDFTransformation.Controllers
             try
             {
                 var file = Request.Form.Files[0];
-                string folderName = "Upload";
-                string webRootPath = _hostingEnvironment.WebRootPath;
-                string newPath = Path.Combine(webRootPath, folderName);
-                if (!Directory.Exists(newPath))
-                {
-                    Directory.CreateDirectory(newPath);
-                }
                 string fileName = CommonUtils.GenerateFileNames(".pdf");
                 if (file.Length > 0)
                 {
-                    string fullPath = Path.Combine(newPath, fileName);
+                    string fullPath = Path.Combine(_newUploadPath, fileName);
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
                         file.CopyTo(stream);

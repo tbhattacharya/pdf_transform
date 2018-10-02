@@ -1,10 +1,12 @@
 ﻿using System.IO;
 using System;
+using System.Linq;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
 using iTextSharp.text.pdf.parser;
 using iTextSharp.xtra.iTextSharp.text.pdf.pdfcleanup;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
@@ -12,6 +14,27 @@ namespace PDFTransformation.PDFUtils
 {
     public static class PDFHelper
     {
+        private static Dictionary<string, string> _contents = new Dictionary<string, string>{
+                    {"Title section", "1,2"},
+                    {"Impressum", "3,4"},
+                    {"Inhaltsverzeichnis", "5"},
+                    {"Abbildungsverzeichnis", "6"},
+                    {"Tabellenverzeichnis", "7"},
+                    {"Dynamic content", "8,9,10,11,12,13"},
+                    {"Abkürzungsverzeichnis", "14,15"}
+                    };
+
+        public static string CreateNewOrder(string content){
+            List<string> result = new List<string>();
+            JArray obj = (JArray)JObject.Parse(content)["order"];
+            foreach (JValue item in obj)
+            {
+                _contents.TryGetValue(item.Value.ToString(), out string res);
+                result.Add(res);
+            }
+            return String.Join(",", result.ToArray());
+        }
+
         public static void ReOrderPages(string inputPdf, string pageSelection, string outputPdf)
         {
             //Bind a reader to our input file
@@ -32,7 +55,8 @@ namespace PDFTransformation.PDFUtils
                             copy.AddPage(copy.GetImportedPage(reader, i));
                         }
                         //Reorder pages
-                        copy.ReorderPages(new int[] { 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 6, 7, 14, 15 });
+                        int[] newOrder = pageSelection.Split(',').Select(n => int.Parse(n)).ToArray();
+                        copy.ReorderPages(newOrder);
                         doc.Close();
                     }
                 }
@@ -70,10 +94,10 @@ namespace PDFTransformation.PDFUtils
                     byte[] data = PdfReader.GetStreamBytes(stream);
                     String oldStr = System.Text.Encoding.UTF8.GetString(data);
 
-                    String pageString = MatchRegex(oldStr, @"\[\(Seite \)\]TJ.*\[\(");
+                    String pageString = CommonUtils.MatchRegex(oldStr, @"\[\(Seite \)\]TJ.*\[\(");
 
                     //Regex replacement of page string
-                    String updatedPageString = Regex.Replace(pageString, @"\[\(\d+\)\]", "[(" +i+")]");
+                    String updatedPageString = Regex.Replace(pageString, @"\[\(\d+\)\]", "[(" + i + ")]");
                     String newString = Regex.Replace(oldStr, @"\[\(Seite \)\]TJ.*\[\(", updatedPageString, RegexOptions.Singleline);
                     stream.SetData(System.Text.Encoding.UTF8.GetBytes(newString));
                 }
@@ -83,15 +107,33 @@ namespace PDFTransformation.PDFUtils
             reader.Close();
         }
 
-        private static String MatchRegex(String input, String pattern)
-        {
-            //Regex word = new Regex(@"\[\(Seite \)\]TJ.*/s");
-            Match match = Regex.Match(input, pattern, RegexOptions.Singleline);
-            while (match.Success)
+        public static void RemoveFooterPagination(string inputPdf, string outputPdf){
+            using (FileStream fs = new FileStream(outputPdf, FileMode.Create, FileAccess.Write))
             {
-                return match.Value;
+                //TaggedPdfReaderTool reader = new TaggedPdfReaderTool();
+                //using (MemoryStream ms = new MemoryStream())
+                //{
+                //    reader.ConvertToXml(new PdfReader(inputPdf), ms);
+
+                //} // Not a tagged pdf
+
+                PdfReader reader = new PdfReader(inputPdf);
+                PdfStamper stamper = new PdfStamper(reader, fs);
+                List<PdfCleanUpLocation> cleanUpLocations = new List<PdfCleanUpLocation>
+                {
+                    new PdfCleanUpLocation(12, new iTextSharp.text.Rectangle(400,0,440,40), BaseColor.WHITE)
+                };
+                PdfCleanUpProcessor cleaner = new PdfCleanUpProcessor(cleanUpLocations, stamper);
+                cleaner.CleanUp();
+
+                //If clean up does not work add a white image
+                iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance(new Bitmap(120, 20), BaseColor.WHITE);
+                image.SetAbsolutePosition(400, 40);
+                //Adds the image to the output pdf
+                stamper.GetOverContent(1).AddImage(image, true);
+                stamper.Close();
+                reader.Close();
             }
-            return "";
         }
     }
 }
