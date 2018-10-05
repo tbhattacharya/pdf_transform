@@ -12,6 +12,7 @@ namespace PDFTransformation.Controllers
 {
     public class BaseController : Controller
     {
+        //Variables to be used frequently in the operation
         readonly IHostingEnvironment _hostingEnvironment;
         protected readonly string _wwwrootPath;
         protected readonly string _folderUpload = "Upload";

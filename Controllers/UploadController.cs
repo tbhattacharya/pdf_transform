@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace PDFTransformation.Controllers
 {
@@ -21,16 +22,19 @@ namespace PDFTransformation.Controllers
         {
             try
             {
-                var file = Request.Form.Files[0];
+                IFormFile file = Request.Form.Files[0];
+
+                //Generate a file name to save in serevr
                 string fileName = CommonUtils.GenerateFileNames(".pdf");
                 if (file.Length > 0)
                 {
                     string fullPath = Path.Combine(_newUploadPath, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    using (FileStream stream = new FileStream(fullPath, FileMode.Create))
                     {
                         file.CopyTo(stream);
                     }
                 }
+                //Return the file name to be used later
                 return Json("fileName:"+ fileName);
             }
             catch (System.Exception ex)

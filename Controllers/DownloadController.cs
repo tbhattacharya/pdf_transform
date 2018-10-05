@@ -23,6 +23,7 @@ namespace PDFTransformation.Controllers
         {
             try
             {
+                //Get the file location
                 FileInfo file = new FileInfo(Path.Combine(_newDownloadPath, fileName));
                 IFileProvider provider = new PhysicalFileProvider(_newDownloadPath);
                 IFileInfo fileInfo = provider.GetFileInfo(fileName);
@@ -34,6 +35,7 @@ namespace PDFTransformation.Controllers
                     Inline = false  // false = prompt the user for downloading;  true = browser to try to show the file inline
                 };
                 Response.Headers.Add("Content-Disposition", cd.ToString());
+                //Return the file
                 return File(readStream, mimeType, fileName);
             }
             catch (System.Exception ex)

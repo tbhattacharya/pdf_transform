@@ -17,6 +17,7 @@ namespace PDFTransformation.PDFUtils
 {
     public static class PDFHelper
     {
+        //Original document content to use as reference.
         private static Dictionary<string, string> _contents = new Dictionary<string, string>{
                     {"Title section", "1,2"},
                     {"Impressum", "3,4"},
@@ -27,28 +28,49 @@ namespace PDFTransformation.PDFUtils
                     {"Abkürzungsverzeichnis", "14,15"}
                     };
 
+        /// <summary>
+        /// This method will create a new page order as per the order of contents provided based on the original pdf.
+        /// </summary>
+        /// <param name="content">
+        /// The input content order in string
+        /// </param>
+        /// <returns>
+        /// The order of page number in string
+        /// </returns>
         public static string CreateNewOrder(string content)
         {
             List<string> result = new List<string>();
             JArray obj = (JArray)JObject.Parse(content)["order"];
+
             foreach (JValue item in obj)
             {
+                //Match against the old content and get page numbers
                 _contents.TryGetValue(item.Value.ToString(), out string res);
                 result.Add(res);
             }
+            //Return comma separated page number in new order
             return String.Join(",", result.ToArray());
         }
 
+        /// <summary>
+        /// Finds the page number of the section(page) in the content order (content).
+        /// </summary>
+        /// <returns>The page number.</returns>
+        /// <param name="content">Content order.</param>
+        /// <param name="page">The sextion for which page number is needed.</param>
         public static int FindPageinContent(string content, string page)
         {
             List<string> result = new List<string>();
             JArray obj = (JArray)JObject.Parse(content)["order"];
             foreach (JValue item in obj)
             {
+                //Match against the old content and get page numbers
                 _contents.TryGetValue(item.Value.ToString(), out string res);
+                //If it matched the section
                 if (item.Value.ToString() == page)
                 {
                     string[] pages = String.Join(",", result.ToArray()).Split(",");
+                    //Return the new page number for the section
                     return (pages.Length + 1);
                 }
                 else
@@ -59,6 +81,12 @@ namespace PDFTransformation.PDFUtils
             return -1;
         }
 
+        /// <summary>
+        /// Re-order the pages of a given pdf and create a new PDF at the output file
+        /// </summary>
+        /// <param name="inputPdf">Input pdf</param>
+        /// <param name="pageSelection">The new order (comma separated pagenumber).</param>
+        /// <param name="outputPdf">Output pdf.</param>
         public static void ReOrderPages(string inputPdf, string pageSelection, string outputPdf)
         {
             //Bind a reader to our input file
@@ -77,8 +105,8 @@ namespace PDFTransformation.PDFUtils
                         for (int i = 1; i <= reader.NumberOfPages; i++)
                         {
                             PdfImportedPage page = copy.GetImportedPage(reader, i);
+                            //Check if tagged pdf
                             Boolean tagged = page.IsTagged();
-
                             copy.AddPage(page);
                         }
 
@@ -91,6 +119,13 @@ namespace PDFTransformation.PDFUtils
             }
         }
 
+        /// <summary>
+        /// Extract the text from pdf. And write to a text file.
+        /// </summary>
+        /// <returns>The text from pages.</returns>
+        /// <param name="pdfPath">The Pdf to read from.</param>
+        /// <param name="pages">The page numbers to read from.</param>
+        /// <param name="outputfile">Outputfile to write the text.</param>
         public static string GetTextFromPages(String pdfPath, int[] pages, string outputfile)
         {
             PdfReader reader = new PdfReader(pdfPath);
@@ -111,26 +146,42 @@ namespace PDFTransformation.PDFUtils
             return output.ToString();
         }
 
+        /// <summary>
+        /// Gets the contents text from page to put in TOC.
+        /// </summary>
+        /// <returns>The name of the page.</returns>
+        /// <param name="pdfPath">The Pdf to read from.</param>
+        /// <param name="page">The pages to read from.</param>
         public static string GetContentsTextFromPage(String pdfPath, int page)
         {
             PdfReader reader = new PdfReader(pdfPath);
             StringWriter output = new StringWriter();
+
+            //Create rectangle to read from header
             Rectangle mediabox = reader.GetPageSize(page);
             float llx = mediabox.GetRight(10f) - 100f;
             float urx = mediabox.GetRight(0f);
             float lly = mediabox.GetTop(10f) - 50f;
             float ury = mediabox.GetTop(0f);
             Rectangle rect = new Rectangle(llx, lly, urx, ury);
+
+            //The header contains the name of the page. Read from Heaedr.
             RenderFilter regionFilter = new RegionTextRenderFilter(rect);
             ITextExtractionStrategy strategy = new FilteredTextRenderListener(
                     new LocationTextExtractionStrategy(), regionFilter);
             output.WriteLine(PdfTextExtractor.GetTextFromPage(reader, page, strategy));
             Console.WriteLine(output.ToString());
             string ret = output.ToString();
+            //Remove newline characters
             return Regex.Replace(ret, @"\t|\n|\r", "");
 
         }
 
+        /// <summary>
+        /// Updates the pagination in the footer.
+        /// </summary>
+        /// <param name="inputPdf">The pdf to modify.</param>
+        /// <param name="outputPdf">The pdf created with updated pagination.</param>
         public static void UpdateFooterPagination(string inputPdf, string outputPdf)
         {
 
@@ -147,9 +198,10 @@ namespace PDFTransformation.PDFUtils
                     byte[] data = PdfReader.GetStreamBytes(stream);
                     String oldStr = System.Text.Encoding.UTF8.GetString(data);
 
+                    //Get the string matching the pagination
                     String pageString = CommonUtils.MatchRegex(oldStr, @"\[\(Seite \)\]TJ.*\[\(");
 
-                    //Regex replacement of page string
+                    //Regex replacement of page string with updated page number
                     String updatedPageString = Regex.Replace(pageString, @"\[\(\d+\)\]", "[(" + i + ")]");
                     String newString = Regex.Replace(oldStr, @"\[\(Seite \)\]TJ.*\[\(", updatedPageString, RegexOptions.Singleline);
                     stream.SetData(System.Text.Encoding.UTF8.GetBytes(newString));
@@ -160,6 +212,11 @@ namespace PDFTransformation.PDFUtils
             reader.Close();
         }
 
+        /// <summary>
+        /// Removes the pagination from the footer.
+        /// </summary>
+        /// <param name="inputPdf">The pdf to modify.</param>
+        /// <param name="outputPdf">The pdf created with removed pagination.</param>
         public static void RemoveFooterPagination(string inputPdf, string outputPdf)
         {
             using (FileStream fs = new FileStream(outputPdf, FileMode.Create, FileAccess.Write))
@@ -192,12 +249,20 @@ namespace PDFTransformation.PDFUtils
             }
         }
 
+        /// <summary>
+        /// Clears the contents of a given page leaving header and footer.
+        /// </summary>
+        /// <param name="inputPdf">The pdf to modify.</param>
+        /// <param name="outputPdf">The pdf created after modification.</param>
+        /// <param name="pageNum">The page number to be cleared.</param>
         public static void ClearContents(string inputPdf, string outputPdf, int pageNum)
         {
             using (FileStream fs = new FileStream(outputPdf, FileMode.Create, FileAccess.Write))
             {
                 PdfReader reader = new PdfReader(inputPdf);
                 PdfStamper stamper = new PdfStamper(reader, fs);
+
+                //Get the reactangle leaving header and footer
                 Rectangle mediabox = reader.GetPageSize(pageNum);
                 float llx = mediabox.GetLeft(10f);
                 float urx = mediabox.GetRight(10f);
@@ -208,6 +273,7 @@ namespace PDFTransformation.PDFUtils
                 {
                     new PdfCleanUpLocation(pageNum, new iTextSharp.text.Rectangle(llx, lly, urx, ury), BaseColor.WHITE)
                 };
+                //Use the PdfCleanUpProcessor to clean the page
                 PdfCleanUpProcessor cleaner = new PdfCleanUpProcessor(cleanUpLocations, stamper);
                 cleaner.CleanUp();
                 stamper.Close();
@@ -215,7 +281,14 @@ namespace PDFTransformation.PDFUtils
             }
         }
 
-        //Generating all contents not working
+        /// <summary>
+        /// Recreate the pdf with a Table of Contents at the given location.
+        /// </summary>
+        /// <param name="inputPdf">The pdf to read from.</param>
+        /// <param name="outputPdf">The pdf created with the TOC.</param>
+        /// <param name="pageTOC">Page number for TOC.</param>
+        /// <param name="pageStart">Starting page for TOC.</param>
+        /// <param name="pageEnd">Ending page for TOC.</param>
         public static void CreateTOC(string inputPdf, string outputPdf, int pageTOC, int pageStart, int pageEnd)
         {
             //Bind a reader to our input file
@@ -228,9 +301,11 @@ namespace PDFTransformation.PDFUtils
                         PdfWriter writer = PdfWriter.GetInstance(doc, fs);
                         doc.Open();
                         PdfContentByte cb = writer.DirectContentUnder;
+
+                        //Get the rectangle to copy and paste
                         Rectangle mediabox = reader.GetPageSize(1);
                         float llx = mediabox.GetLeft(0f);
-                        float lly = mediabox.GetBottom(0f); // Leave footer
+                        float lly = mediabox.GetBottom(0f);
 
                         //Not working
                         //TOCEvent evento = new TOCEvent(); 
@@ -238,19 +313,24 @@ namespace PDFTransformation.PDFUtils
 
                         //Create the list of pageIndex manulally.
                         List<PageIndex> toc = new List<PageIndex>();
+
                         for (int i = pageStart; i <= pageEnd; i++)
                         {
                             String text = GetContentsTextFromPage(inputPdf, i);
                             toc.Add(new PageIndex() { Text = text, Name = text, Page = i });
                         }
 
+                        //Start copying the pdf
                         for (int i = 1; i <= reader.NumberOfPages; i++)
                         {
-                            if (i == pageTOC)
+                            if (i == pageTOC) //This is the TOC page.
                             {
+                                //Add header and footer
                                 doc.NewPage();
                                 PdfImportedPage page = writer.GetImportedPage(reader, i);
                                 cb.AddTemplate(page, llx, lly);
+
+                                //Create TOC
                                 Chunk dottedLine = new Chunk(new DottedLineSeparator());
                                 // Change later for drawing with rectangle
                                 Paragraph gap = new Paragraph
@@ -275,7 +355,7 @@ namespace PDFTransformation.PDFUtils
                                     doc.Add(p);
                                 }
                             }
-                            else
+                            else // other pages write
                             {
                                 doc.NewPage();
                                 PdfImportedPage page = writer.GetImportedPage(reader, i);
@@ -287,7 +367,14 @@ namespace PDFTransformation.PDFUtils
             }
         }
 
-        //Generate just TOC page
+        /// <summary>
+        /// Creates just the TOC page.
+        /// </summary>
+        /// <param name="inputPdf">The pdf to read from.</param>
+        /// <param name="outputPdf">The toc pdf.</param>
+        /// <param name="pageTOC">Page number for TOC page.</param>
+        /// <param name="pageStart">The start of Contents for TOC.</param>
+        /// <param name="pageEnd">The end of contents for TOC.</param>
         public static void CreateTOCPage(string inputPdf, string outputPdf, int pageTOC, int pageStart, int pageEnd)
         {
             //Bind a reader to our input file
@@ -305,7 +392,7 @@ namespace PDFTransformation.PDFUtils
                         for (int i = pageStart; i <= pageEnd; i++)
                         {
                             String text = GetContentsTextFromPage(inputPdf, i);
-                            toc.Add(new PageIndex() { Text = text, Name = text, Page = i });
+                            toc.Add(new PageIndex() { Text = text, Name = "dest" + (i), Page = i });
                         }
 
                         doc.NewPage();
@@ -330,31 +417,4 @@ namespace PDFTransformation.PDFUtils
             }
         }
     }
-}
-
-public class TOCEvent : PdfPageEventHelper
-{
-    protected int counter = 0;
-    protected List<PageIndex> toc = new List<PageIndex>();
-
-    public override void OnGenericTag(PdfWriter writer, Document document, iTextSharp.text.Rectangle rect, string text)
-    {
-        String name = "dest" + (counter++);
-        int page = writer.PageNumber;
-        toc.Add(new PageIndex() { Text = text, Name = name, Page = page });
-        writer.DirectContent.LocalDestination(name, new PdfDestination(PdfDestination.FITH, rect.GetTop(0)));
-    }
-
-    public List<PageIndex> GetTOC()
-    {
-        return toc;
-    }
-}
-
-public class PageIndex
-{
-    public string Text { get; set; }
-    public string Name { get; set; }
-    public int Page { get; set; }
-
 }
